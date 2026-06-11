@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>NIGHTMARE CLICKER</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1a0000">
+
+<!-- iOS "Add to Home Screen" support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nightmare">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="fog"></div>
+
+<div class="container">
+  <h1 class="title">NIGHTMARE CLICKER</h1>
+  <p class="subtitle">Что-то наблюдает за тобой из тьмы...</p>
+
+  <div class="stats">
+    <div class="stat-box">
+      <span class="stat-label">Очки</span>
+      <span class="stat-value" id="points">0</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Уровень кошмара</span>
+      <span class="stat-value" id="level">1</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Рекорд</span>
+      <span class="stat-value" id="record">0</span>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>До следующего уровня:</span>
+      <span id="progress-text">0 / 100</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="clicker-wrap">
+    <button id="clicker" class="clicker-btn">
+      <span class="eye">👁️</span>
+    </button>
+    <div class="click-hint" id="click-hint">
+      <span class="click-hint-arrow">↘</span>
+      <span class="click-hint-text">Ударь по глазу!</span>
+    </div>
+  </div>
+
+  <p class="hint" id="click-power">Каждый клик: +10 очков</p>
+
+  <div class="levelup-banner" id="levelup-banner"></div>
+
+  <button id="install-btn" class="install-btn" hidden>📲 Установить игру</button>
+
+  <button id="reset" class="reset-btn">Сбросить прогресс</button>
+</div>
+
+<div class="modal-overlay" id="install-modal" hidden>
+  <div class="modal-box">
+    <button class="modal-close" id="install-modal-close" aria-label="Закрыть">&times;</button>
+    <h2 class="modal-title">Установка</h2>
+    <div class="modal-body" id="install-modal-body"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
