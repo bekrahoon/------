@@ -22,6 +22,7 @@ let state = { points: 0, level: 1 };
 let record = 0;
 let db = null;
 let deferredInstallPrompt = null;
+let swRegistration = null;
 
 function pointsPerClick(level) {
   return level * 10;
@@ -142,10 +143,38 @@ function showLevelUp(level) {
   levelupBanner.classList.remove('show');
   void levelupBanner.offsetWidth;
   levelupBanner.classList.add('show');
+
+  notifyLevelUp(level);
+}
+
+function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function notifyLevelUp(level) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const title = `Новый уровень: ${level}!`;
+  const options = {
+    body: getLevelUpPhrase(level),
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: 'levelup'
+  };
+
+  if (swRegistration) {
+    swRegistration.showNotification(title, options);
+  } else {
+    new Notification(title, options);
+  }
 }
 
 async function handleClick() {
   hideClickHint();
+  requestNotificationPermission();
 
   const gain = pointsPerClick(state.level);
   state.points += gain;
@@ -306,8 +335,12 @@ init();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch((e) => {
-      console.warn('Не удалось зарегистрировать service worker', e);
-    });
+    navigator.serviceWorker.register('sw.js')
+      .then((registration) => {
+        swRegistration = registration;
+      })
+      .catch((e) => {
+        console.warn('Не удалось зарегистрировать service worker', e);
+      });
   });
 }
