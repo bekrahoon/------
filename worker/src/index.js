@@ -20,6 +20,29 @@ function getLevelUpPhrase(level) {
   return LEVELUP_PHRASES[(level - 2 + LEVELUP_PHRASES.length) % LEVELUP_PHRASES.length];
 }
 
+const REMINDER_PHRASES = [
+  'Оно скучает по тебе...',
+  'Тьма становится гуще без тебя.',
+  'Глаз так и не закрылся — он ждёт.',
+  'Тени зовут тебя обратно.',
+  'Кошмар не закончился. Он просто ждёт.',
+  'Что-то осталось недосказанным...',
+  'Возвращайся, пока ещё не поздно.'
+];
+
+function getReminderPhrase() {
+  return REMINDER_PHRASES[Math.floor(Math.random() * REMINDER_PHRASES.length)];
+}
+
+async function sendReminders(env) {
+  const list = await env.USERS.list();
+  for (const key of list.keys) {
+    const chatId = key.name;
+    await sendMessage(env, chatId, `👁️ ${getReminderPhrase()}\n\nВозвращайся в Nightmare Clicker!`);
+  }
+  return list.keys.length;
+}
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -42,7 +65,20 @@ export default {
       return handleNotify(request, env);
     }
 
+    // Ручной запуск напоминаний для проверки (защищён токеном бота)
+    if (url.pathname === '/test-reminder' && request.method === 'GET') {
+      if (url.searchParams.get('token') !== env.BOT_TOKEN) {
+        return new Response('Forbidden', { status: 403 });
+      }
+      const count = await sendReminders(env);
+      return new Response(`Sent reminders to ${count} user(s)`);
+    }
+
     return new Response('Not found', { status: 404 });
+  },
+
+  async scheduled(event, env, ctx) {
+    await sendReminders(env);
   }
 };
 
