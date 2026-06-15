@@ -24,6 +24,34 @@ let db = null;
 let deferredInstallPrompt = null;
 let swRegistration = null;
 
+const tg = window.Telegram && window.Telegram.WebApp;
+
+function setupTelegram() {
+  if (!tg) return;
+
+  tg.ready();
+  tg.expand();
+
+  try {
+    tg.setHeaderColor('#1a0000');
+    tg.setBackgroundColor('#000000');
+  } catch (e) {
+    // Старые версии клиента могут не поддерживать эти методы
+  }
+}
+
+function hapticImpact(style) {
+  if (tg && tg.HapticFeedback) {
+    tg.HapticFeedback.impactOccurred(style);
+  }
+}
+
+function hapticLevelUp() {
+  if (tg && tg.HapticFeedback) {
+    tg.HapticFeedback.notificationOccurred('success');
+  }
+}
+
 function pointsPerClick(level) {
   return level * 10;
 }
@@ -145,6 +173,7 @@ function showLevelUp(level) {
   levelupBanner.classList.add('show');
 
   notifyLevelUp(level);
+  hapticLevelUp();
 }
 
 function requestNotificationPermission() {
@@ -199,6 +228,8 @@ async function handleClick() {
   clickerBtn.classList.remove('shake');
   void clickerBtn.offsetWidth;
   clickerBtn.classList.add('shake');
+
+  hapticImpact('light');
 
   updateUI();
 }
@@ -264,7 +295,7 @@ function hideInstallModal() {
 }
 
 function setupInstallButton() {
-  if (isStandalone()) return;
+  if (isStandalone() || tg) return;
 
   installBtn.hidden = false;
 
@@ -304,6 +335,7 @@ function setupInstallButton() {
 }
 
 async function init() {
+  setupTelegram();
   loadProgress();
 
   try {
