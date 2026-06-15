@@ -20,9 +20,19 @@ function getLevelUpPhrase(level) {
   return LEVELUP_PHRASES[(level - 2 + LEVELUP_PHRASES.length) % LEVELUP_PHRASES.length];
 }
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type'
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: CORS_HEADERS });
+    }
 
     if (url.pathname === '/webhook' && request.method === 'POST') {
       return handleWebhook(request, env);
@@ -54,28 +64,28 @@ async function handleNotify(request, env) {
   try {
     body = await request.json();
   } catch (e) {
-    return new Response('Bad request', { status: 400 });
+    return new Response('Bad request', { status: 400, headers: CORS_HEADERS });
   }
 
   const { initData, level } = body;
   if (!initData || !level) {
-    return new Response('Bad request', { status: 400 });
+    return new Response('Bad request', { status: 400, headers: CORS_HEADERS });
   }
 
   const user = await verifyInitData(initData, env.BOT_TOKEN);
   if (!user) {
-    return new Response('Invalid initData', { status: 403 });
+    return new Response('Invalid initData', { status: 403, headers: CORS_HEADERS });
   }
 
   const chatId = user.id;
   const registered = await env.USERS.get(String(chatId));
   if (!registered) {
-    return new Response('ok');
+    return new Response('ok', { headers: CORS_HEADERS });
   }
 
   await sendMessage(env, chatId, `УРОВЕНЬ ${level}!\n${getLevelUpPhrase(level)}`);
 
-  return new Response('ok');
+  return new Response('ok', { headers: CORS_HEADERS });
 }
 
 async function sendMessage(env, chatId, text) {
