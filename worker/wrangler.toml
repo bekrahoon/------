@@ -3,5 +3,5 @@ main = "src/index.js"
 compatibility_date = "2024-11-01"
 
 kv_namespaces = [
-  { binding = "USERS", id = "REPLACE_WITH_KV_NAMESPACE_ID" }
+  { binding = "USERS", id = "dedc0aea27a54f88bcc91510e4d7ebad" }
 ]

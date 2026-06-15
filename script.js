@@ -27,7 +27,7 @@ let swRegistration = null;
 const tg = window.Telegram && window.Telegram.WebApp;
 
 // URL Cloudflare Worker'а, который шлёт уведомления от бота (см. /worker)
-const NOTIFY_URL = 'https://nightmare-clicker-bot.YOUR_SUBDOMAIN.workers.dev/notify';
+const NOTIFY_URL = 'https://nightmare-clicker-bot.clickerbeka-bot.workers.dev/notify';
 
 function setupTelegram() {
   if (!tg) return;
