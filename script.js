@@ -26,6 +26,9 @@ let swRegistration = null;
 
 const tg = window.Telegram && window.Telegram.WebApp;
 
+// URL Cloudflare Worker'а, который шлёт уведомления от бота (см. /worker)
+const NOTIFY_URL = 'https://nightmare-clicker-bot.YOUR_SUBDOMAIN.workers.dev/notify';
+
 function setupTelegram() {
   if (!tg) return;
 
@@ -50,6 +53,16 @@ function hapticLevelUp() {
   if (tg && tg.HapticFeedback) {
     tg.HapticFeedback.notificationOccurred('success');
   }
+}
+
+function notifyBotLevelUp(level) {
+  if (!tg || !tg.initData) return;
+
+  fetch(NOTIFY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ initData: tg.initData, level })
+  }).catch(() => {});
 }
 
 function pointsPerClick(level) {
@@ -174,6 +187,7 @@ function showLevelUp(level) {
 
   notifyLevelUp(level);
   hapticLevelUp();
+  notifyBotLevelUp(level);
 }
 
 function requestNotificationPermission() {
