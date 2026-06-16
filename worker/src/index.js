@@ -105,7 +105,7 @@ async function handleWebhook(request, env) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: 'Добро пожаловать в Nightmare Clicker 👁️\n\nНажми кнопку ниже или «Открыть» в меню, чтобы начать.',
+        text: 'Добро пожаловать в Nightmare Clicker 👁️\n\nНажми кнопку ниже или «Открыть» в меню чата, чтобы начать.\n\nПрямая ссылка: t.me/IThinkItsClicker_bot/play',
         reply_markup: {
           inline_keyboard: [[{
             text: '👁️ Открыть игру',
