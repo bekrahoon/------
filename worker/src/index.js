@@ -74,6 +74,14 @@ export default {
       return new Response(`Sent reminders to ${count} user(s)`);
     }
 
+    if (url.pathname === '/setup-menu' && request.method === 'GET') {
+      if (url.searchParams.get('token') !== env.BOT_TOKEN) {
+        return new Response('Forbidden', { status: 403 });
+      }
+      await setWebAppMenuButton(env, null);
+      return new Response('Default menu button set for all chats');
+    }
+
     return new Response('Not found', { status: 404 });
   },
 
@@ -82,6 +90,8 @@ export default {
   }
 };
 
+const WEBAPP_URL = 'https://bekrahoon.github.io/------/';
+
 async function handleWebhook(request, env) {
   const update = await request.json();
   const message = update.message;
@@ -89,7 +99,21 @@ async function handleWebhook(request, env) {
   if (message && message.text === '/start') {
     const chatId = message.chat.id;
     await env.USERS.put(String(chatId), '1');
-    await sendMessage(env, chatId, 'Привет! Теперь я сообщу тебе, когда ты поднимешься на новый уровень кошмара в Nightmare Clicker 👁️');
+    await setWebAppMenuButton(env, chatId);
+    await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: 'Добро пожаловать в Nightmare Clicker 👁️\n\nНажми кнопку ниже или «Открыть» в меню, чтобы начать.',
+        reply_markup: {
+          inline_keyboard: [[{
+            text: '👁️ Открыть игру',
+            web_app: { url: WEBAPP_URL }
+          }]]
+        }
+      })
+    });
   }
 
   return new Response('ok');
@@ -122,6 +146,18 @@ async function handleNotify(request, env) {
   await sendMessage(env, chatId, `УРОВЕНЬ ${level}!\n${getLevelUpPhrase(level)}`);
 
   return new Response('ok', { headers: CORS_HEADERS });
+}
+
+async function setWebAppMenuButton(env, chatId) {
+  const body = {
+    menu_button: { type: 'web_app', text: 'Открыть', web_app: { url: WEBAPP_URL } }
+  };
+  if (chatId) body.chat_id = chatId;
+  await fetch(`https://api.telegram.org/bot${env.BOT_TOKEN}/setChatMenuButton`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 }
 
 async function sendMessage(env, chatId, text) {
