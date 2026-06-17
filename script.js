@@ -41,6 +41,39 @@ function setupTelegram() {
   } catch (e) {
     // Старые версии клиента могут не поддерживать эти методы
   }
+
+  setupMainButton();
+}
+
+function setupMainButton() {
+  if (!tg || !tg.MainButton) return;
+
+  tg.MainButton.color = '#8b0000';
+  tg.MainButton.textColor = '#ffffff';
+  tg.MainButton.onClick(handleShare);
+}
+
+function updateMainButton() {
+  if (!tg || !tg.MainButton) return;
+
+  if (state.level >= 2) {
+    tg.MainButton.text = `👁 Поделиться — Уровень ${state.level}`;
+    tg.MainButton.show();
+  } else {
+    tg.MainButton.hide();
+  }
+}
+
+function handleShare() {
+  const text = `Я достиг ${state.level} уровня кошмара в Nightmare Clicker! 👁\n${state.points} очков\n\nt.me/IThinkItsClicker_bot/play`;
+
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text)
+      .then(() => tg.showPopup({ message: 'Текст скопирован! Вставь его в любой чат.' }))
+      .catch(() => {});
+  }
 }
 
 function hapticImpact(style) {
@@ -177,6 +210,7 @@ function updateUI() {
   progressFillEl.style.width = percent + '%';
 
   clickPowerEl.textContent = `Каждый клик: +${pointsPerClick(state.level)} очков`;
+  updateMainButton();
 }
 
 function showLevelUp(level) {
